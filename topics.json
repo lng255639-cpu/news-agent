@@ -1,0 +1,31 @@
+{
+  "site_title": "每日新聞簡報",
+  "site_note": "由 news_agent 自動整理，每則連結指向原始報導。",
+  "topics": [
+    {
+      "slug": "ai",
+      "label": "AI",
+      "question": "今天 AI 有什麼重要新聞？",
+      "top": 8
+    },
+    {
+      "slug": "semiconductor",
+      "label": "半導體",
+      "question": "今天半導體與晶片產業有什麼重要新聞？",
+      "top": 6
+    },
+    {
+      "slug": "taiwan-tech",
+      "label": "台灣科技",
+      "question": "今天台灣有什麼重要的產業與經濟新聞？半導體以外的領域",
+      "top": 6
+    },
+    {
+      "slug": "world",
+      "label": "國際",
+      "question": "今天國際上有什麼重要新聞？",
+      "top": 8,
+      "hours": 24
+    }
+  ]
+}
