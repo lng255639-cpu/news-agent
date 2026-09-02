@@ -105,7 +105,15 @@ ALLOWED_ORIGINS = [
     if o.strip()
 ]
 
-MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "700"))
+MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "2000"))
+
+# 新一代模型（gemini-3.x 等）會先「思考」再回答，而思考過程也算進 MAX_TOKENS。
+# 額度不夠時，話會講到一半就被切斷。兩個對策：
+#   1. MAX_TOKENS 給寬一點（上面已經從 700 提高到 2000）
+#   2. 設 REASONING_EFFORT=low 或 none，叫模型少想一點
+# 這個小助手回答的都是簡單的事實查詢，不需要深度推理，設 low 通常最划算。
+# 供應商不支援這個參數的話會自動退回預設，不會壞掉。
+REASONING_EFFORT = os.environ.get("REASONING_EFFORT", "").strip()
 MAX_CHARS_PER_MESSAGE = int(os.environ.get("MAX_CHARS_PER_MESSAGE", "600"))
 MAX_HISTORY_TURNS = int(os.environ.get("MAX_HISTORY_TURNS", "10"))
 
@@ -378,15 +386,33 @@ def stream_reply(entry: dict, history: List[dict]):
                 yield piece
     else:
         system_text = "\n\n".join(b["text"] for b in blocks)
-        result = entry["client"].chat.completions.create(
-            model=entry["model"],
-            messages=[{"role": "system", "content": system_text}] + history,
-            max_tokens=MAX_TOKENS,
-            stream=True,
-        )
+        kwargs = {
+            "model": entry["model"],
+            "messages": [{"role": "system", "content": system_text}] + history,
+            "max_tokens": MAX_TOKENS,
+            "stream": True,
+        }
+        if REASONING_EFFORT:
+            kwargs["reasoning_effort"] = REASONING_EFFORT
+
+        try:
+            result = entry["client"].chat.completions.create(**kwargs)
+        except Exception:
+            # 這家不認得 reasoning_effort，拿掉重試一次，不要整個掛掉
+            if "reasoning_effort" not in kwargs:
+                raise
+            print(f"[{entry['name']}] 不支援 reasoning_effort，改用預設值重試")
+            kwargs.pop("reasoning_effort")
+            result = entry["client"].chat.completions.create(**kwargs)
+
         for chunk in result:
             if not chunk.choices:
                 continue
+            if chunk.choices[0].finish_reason == "length":
+                print(
+                    f"[{entry['name']}] ⚠ 回答被截斷，目前 MAX_TOKENS={MAX_TOKENS}。"
+                    f"請調高這個值，或設 REASONING_EFFORT=low 讓模型少想一點。"
+                )
             piece = chunk.choices[0].delta.content
             if piece:
                 yield piece
