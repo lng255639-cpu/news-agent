@@ -57,6 +57,10 @@ SUMMARY_CHARS = int(os.environ.get("SUMMARY_CHARS", "120"))
 #     from openai import OpenAI
 #     c = OpenAI(api_key="你的key", base_url="下面那個網址")
 #     print([m.id for m in c.models.list()])
+#
+# 實際遇過的例子：2026 年 9 月 gemini-2.5-flash 對新帳號停用，
+# 錯誤訊息會直接告訴你該換成哪一個。不用改這裡，
+# 到部署平台加一個 GEMINI_MODEL 環境變數覆蓋掉就好。
 # ────────────────────────────────────────────────
 
 PROVIDERS = {
@@ -64,7 +68,7 @@ PROVIDERS = {
         "kind": "openai",
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
         "key_env": "GEMINI_API_KEY",
-        "model": "gemini-2.5-flash",
+        "model": "gemini-3.6-flash",
     },
     "groq": {
         "kind": "openai",
@@ -180,11 +184,18 @@ def _clip(text: str, limit: int) -> str:
 
 
 def _format_topic(data: dict) -> str:
-    lines = [f"### {data.get('label', '?')}（{data.get('slug', '?')}.html）"]
+    slug = data.get("slug", "?")
+    lines = [
+        f"### {data.get('label', '?')}",
+        f"主題頁網址：{SITE_BASE}/{slug}.html",
+    ]
     stamp = data.get("generated_at", "")
     if stamp:
         lines.append(f"產生時間：{stamp}")
 
+    # 刻意不放每則新聞的原始連結。那是 Google News 的加密網址，
+    # 一則就一百多個字元的亂碼，模型很容易把它當成內容吐出來。
+    # 要看原始報導請訪客去主題頁點標題，那裡的連結才是完整可用的。
     for i, item in enumerate(data.get("items", []), 1):
         sources = item.get("sources") or []
         lines.append(
@@ -192,8 +203,7 @@ def _format_topic(data: dict) -> str:
             f"   摘要：{_clip(item.get('summary', ''), SUMMARY_CHARS)}\n"
             f"   為什麼重要：{_clip(item.get('why', ''), SUMMARY_CHARS)}\n"
             f"   佐證：{item.get('source_count', 0)} 家（{'、'.join(sources[:6])}）\n"
-            f"   時間：{item.get('time_label', '')}\n"
-            f"   連結：{item.get('link', '')}"
+            f"   時間：{item.get('time_label', '')}"
         )
     return "\n".join(lines)
 
@@ -249,9 +259,13 @@ RULES = f"""你是「{AI_NAME}」，{SITE_NAME}的AI小助手。
 3. 不評論時事、不對任何事件表達立場、不預測後續發展、
    不評價任何媒體的好壞或可信度。被問到就說這超出你的範圍。
 4. 你看到的是簡報的摘要，不是原始報導全文。
-   提到具體某則新聞時，附上它的連結，請對方看原始報導了解完整內容。
+   提到具體某則新聞時，請對方到那個主題頁點標題看原始報導，
+   並附上主題頁網址（例如 .../ai.html）。
 5. 網站說明的部分，只根據下方「網站說明」回答。
    說明裡沒寫的，坦白說不知道。
+6. 你的回答只能是給人看的中文句子。
+   絕對不要輸出一長串英數字母、編碼字串、或任何看起來像亂碼的東西。
+   如果你發現自己正要輸出這種內容，停下來，改用文字描述。
 
 其他規則：
 
