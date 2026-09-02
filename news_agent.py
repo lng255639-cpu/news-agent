@@ -751,6 +751,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 {items}
 <footer>由 news_agent 自動整理　·　佐證格數代表有幾家媒體報導同一事件</footer>
 </div>
+<script src="https://news-agent-assistant.onrender.com/widget.js"
+        data-name="AI小助手"
+        data-accent="#0b6e6e"
+        data-starters="這頁在講什麼？|那排小格子是什麼意思？|其他主題今天有什麼？"></script>
 </body>
 </html>
 """

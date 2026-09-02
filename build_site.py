@@ -15,6 +15,7 @@
 
 import argparse
 import json
+import shutil
 import sys
 import time
 import traceback
@@ -72,6 +73,11 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     text-decoration: none; color: inherit;
   }}
   a.card:hover {{ border-color: var(--signal); }}
+  .card.dead {{
+    display: block; background: var(--card); border: 1px dashed var(--rule);
+    border-radius: 3px; padding: 1.3rem 1.5rem; margin-bottom: .9rem;
+    opacity: .65;
+  }}
   a.card:focus-visible {{ outline: 2px solid var(--signal); outline-offset: 3px; }}
   .label {{
     font-family: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
@@ -89,6 +95,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     font-family: "Segoe UI", system-ui, sans-serif;
     font-size: .75rem; color: var(--muted);
   }}
+  footer a {{ color: var(--signal); }}
   @media (max-width: 30rem) {{
     body {{ padding: 2rem .9rem 3rem; }}
     a.card {{ padding: 1.1rem; }}
@@ -101,8 +108,12 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   <h1>{site_title}</h1>
   <p class="meta">更新於 {stamp}</p>
 {cards}
-  <footer>{site_note}</footer>
+  <footer>{site_note}<br><a href="about.html">關於這個網站</a></footer>
 </div>
+<script src="https://news-agent-assistant.onrender.com/widget.js"
+        data-name="AI小助手"
+        data-accent="#0b6e6e"
+        data-starters="今天有什麼重要新聞？|那排小格子是什麼意思？|時間標籤怎麼看？"></script>
 </body>
 </html>
 """
@@ -114,16 +125,36 @@ CARD_TEMPLATE = """  <a class="card" href="{slug}.html">
   </a>
 """
 
+# 頁面根本不存在時用這個 —— 連過去只會 404，不如不要做成連結。
+# CI 環境每次都是全新 checkout，沒有舊頁面可以沿用。
+DEAD_CARD_TEMPLATE = """  <div class="card dead">
+    <p class="label">{label}</p>
+    <p class="lede">{lede}</p>
+    <div class="stamp"><span class="stale">本次未能產生</span></div>
+  </div>
+"""
+
 
 def render_index(config, states, out_dir):
     now = datetime.now(timezone.utc)
     cards = []
 
     for topic in config["topics"]:
-        state = states.get(topic["slug"], {})
+        slug = topic["slug"]
+        state = states.get(slug, {})
+        page_exists = (out_dir / f"{slug}.html").exists()
+
+        if not page_exists:
+            # 連過去會 404，做成不可點的卡片
+            cards.append(DEAD_CARD_TEMPLATE.format(
+                label=_esc(topic["label"]),
+                lede=_esc("這次建置沒有產生內容，下次更新會再試。"),
+            ))
+            continue
+
         if not state.get("ok"):
             lede = "（本次更新失敗，顯示的是上一版內容）"
-            updated = state.get("updated_label") or "尚未產生"
+            updated = state.get("updated_label") or "時間不明"
             stale = "stale"
         else:
             lede = state.get("lede", "")
@@ -131,7 +162,7 @@ def render_index(config, states, out_dir):
             stale = ""
 
         cards.append(CARD_TEMPLATE.format(
-            slug=_esc(topic["slug"]),
+            slug=_esc(slug),
             label=_esc(topic["label"]),
             lede=_esc(lede),
             updated=_esc(updated),
@@ -288,6 +319,26 @@ def main():
             previous = states.get(slug, {})
             previous["ok"] = False
             states[slug] = previous
+
+    # static/ 裡的檔案原樣複製過去（例如 about.html）。
+    # public/ 每次都是重新產生的，手寫的頁面放這裡才不會被洗掉。
+    static_dir = Path("static")
+    if static_dir.is_dir():
+        copied = 0
+        for f in static_dir.iterdir():
+            if f.is_file():
+                shutil.copy2(f, out_dir / f.name)
+                copied += 1
+        if copied:
+            print(f"\n複製 {copied} 個靜態檔案", file=sys.stderr)
+
+    # 自訂網域：GitHub Pages 靠發布內容裡的 CNAME 檔記住網域。
+    # public/ 每次都是重新產生的，不寫這個檔的話每次部署都會掉回
+    # 預設的 xxx.github.io 網址。
+    domain = config.get("custom_domain", "").strip()
+    if domain:
+        (out_dir / "CNAME").write_text(domain + "\n", encoding="utf-8")
+        print(f"\n自訂網域：{domain}", file=sys.stderr)
 
     index = render_index(config, states, out_dir)
     state_file.write_text(json.dumps(states, ensure_ascii=False, indent=2),

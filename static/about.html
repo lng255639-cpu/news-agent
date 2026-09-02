@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>關於這個網站｜每日新聞簡報</title>
+<style>
+  :root {
+    --paper: #f2f4f7; --card: #ffffff; --ink: #16202e;
+    --muted: #5c6b7f; --rule: #d6dce4; --signal: #0b6e6e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 3rem 1.25rem 4rem;
+    background: var(--paper); color: var(--ink);
+    font-family: Georgia, "Songti TC", serif; line-height: 1.7;
+  }
+  .wrap { max-width: 44rem; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: .72rem; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--signal); margin: 0 0 .5rem;
+  }
+  h1 {
+    font-family: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
+    font-size: 1.9rem; font-weight: 600; letter-spacing: -.015em;
+    margin: 0 0 1rem;
+  }
+  h2 {
+    font-family: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
+    font-size: 1.15rem; font-weight: 600; letter-spacing: -.01em;
+    margin: 2.6rem 0 .8rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+  }
+  p { margin: 0 0 1rem; }
+  .lede { font-size: 1.05rem; }
+
+  /* 範例卡片：跟實際頁面長得一樣，但加上編號標記 */
+  .demo {
+    background: var(--card); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 1.4rem 1.5rem; margin: 1.2rem 0;
+    position: relative;
+  }
+  .corro { display: flex; align-items: center; gap: .55rem; margin-bottom: .7rem; }
+  .bars { display: flex; gap: 2px; }
+  .bar { width: 4px; height: 13px; background: var(--signal); border-radius: 1px; }
+  .bar.off { background: var(--rule); }
+  .corro-label {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: .72rem; letter-spacing: .04em; color: var(--muted);
+  }
+  .demo h3 {
+    font-family: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
+    font-size: 1.14rem; font-weight: 600; line-height: 1.4;
+    margin: 0 0 .5rem; color: var(--ink);
+  }
+  .demo h3 span { color: var(--signal); text-decoration: underline; }
+  .demo .summary { margin: 0 0 .7rem; font-size: .97rem; }
+  .demo .why {
+    margin: 0 0 .9rem; padding-left: .8rem;
+    border-left: 2px solid var(--signal);
+    font-size: .92rem; color: var(--muted);
+  }
+  .demo .foot {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: .78rem; color: var(--muted);
+    display: flex; flex-wrap: wrap; gap: .4rem .9rem;
+  }
+  .tag {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.15rem; height: 1.15rem; margin-right: .35rem;
+    border-radius: 50%; background: var(--signal); color: #fff;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: .68rem; font-weight: 600; vertical-align: 2px;
+  }
+  ol.legend { margin: 1rem 0 0; padding-left: 0; list-style: none; }
+  ol.legend li { margin-bottom: .7rem; font-size: .95rem; }
+
+  /* 佐證強度對照 */
+  .scale { margin: 1.2rem 0; }
+  .scale-row {
+    display: flex; align-items: center; gap: .8rem;
+    padding: .55rem 0; border-bottom: 1px solid var(--rule);
+  }
+  .scale-row:last-child { border-bottom: none; }
+  .scale-row .bars { flex: 0 0 auto; width: 3.2rem; }
+  .scale-row .what {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: .88rem;
+  }
+
+  .note {
+    background: var(--card); border-left: 3px solid var(--signal);
+    padding: 1rem 1.2rem; margin: 1.2rem 0; font-size: .95rem;
+  }
+  a { color: var(--signal); }
+  a:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  footer {
+    margin-top: 3rem; border-top: 1px solid var(--rule); padding-top: 1.2rem;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: .8rem; color: var(--muted);
+  }
+  @media (max-width: 30rem) {
+    body { padding: 2rem .9rem 3rem; }
+    .demo { padding: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">關於</p>
+  <h1>這個網站是什麼</h1>
+
+  <p class="lede">
+    這裡把過去 24 小時的新聞整理成幾則重點。同一件事被很多家媒體報導時，
+    會合併成一則，並標示有幾家報導過——這是判斷一則新聞重不重要最直接的線索。
+  </p>
+
+  <p>
+    每天早上更新一次。分成幾個主題，從首頁點進去就是那個主題的當日重點。
+  </p>
+
+  <h2>一則新聞長什麼樣子</h2>
+
+  <div class="demo">
+    <div class="corro">
+      <span class="bars">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        <span class="bar off"></span><span class="bar off"></span>
+      </span>
+      <span class="corro-label"><span class="tag">1</span>3 家媒體</span>
+    </div>
+    <h3><span class="tag">2</span><span>台積電董事會通過新一輪資本支出</span></h3>
+    <p class="summary"><span class="tag">3</span>董事會核准先進製程擴產計畫，金額創近年新高，
+      將用於三奈米以下製程的產能建置。</p>
+    <p class="why"><span class="tag">4</span>是判斷半導體景氣循環位置的重要訊號。</p>
+    <div class="foot">
+      <span><span class="tag">5</span>3 小時前（今天 11:00）</span>
+      <span>工商時報、經濟日報、中央社</span>
+    </div>
+  </div>
+
+  <ol class="legend">
+    <li><span class="tag">1</span><strong>佐證強度</strong>——有幾家媒體獨立報導這件事。
+      格子越多，這則消息越可能是真的大事。</li>
+    <li><span class="tag">2</span><strong>標題</strong>——點下去會直接開啟原始報導。
+      標題經過改寫，讓它在不看內文的情況下也講得清楚。</li>
+    <li><span class="tag">3</span><strong>摘要</strong>——發生了什麼事，兩三句話。</li>
+    <li><span class="tag">4</span><strong>為什麼重要</strong>——這件事的意義或影響。
+      這是這個網站跟一般新聞列表最不一樣的地方。</li>
+    <li><span class="tag">5</span><strong>時間與來源</strong>——最早的報導是什麼時候發出的，
+      以及有哪些媒體報導過。</li>
+  </ol>
+
+  <h2>那排小格子怎麼讀</h2>
+
+  <p>
+    這是整個網站最值得注意的一個記號。它代表<strong>有幾家不同的媒體
+    報導了同一件事</strong>，而不是這則新聞被點了幾次或有多熱門。
+  </p>
+
+  <div class="scale">
+    <div class="scale-row">
+      <span class="bars">
+        <span class="bar"></span><span class="bar off"></span><span class="bar off"></span>
+        <span class="bar off"></span><span class="bar off"></span>
+      </span>
+      <span class="what">只有一家報導。可能是獨家搶先，也可能還沒被查證。</span>
+    </div>
+    <div class="scale-row">
+      <span class="bars">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        <span class="bar off"></span><span class="bar off"></span>
+      </span>
+      <span class="what">幾家都報了。多半是確實發生的事。</span>
+    </div>
+    <div class="scale-row">
+      <span class="bars">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        <span class="bar"></span><span class="bar"></span>
+      </span>
+      <span class="what">五家以上。當天的大事。</span>
+    </div>
+  </div>
+
+  <div class="note">
+    格子少不代表假的，格子多也不代表一定重要——有些話題本來就只有特定媒體在追。
+    把它當成一個判斷的參考，不是結論。
+  </div>
+
+  <h2>時間標籤</h2>
+
+  <p>
+    每則會標「3 小時前（今天 11:00）」這樣的時間，指的是
+    <strong>最早那則報導</strong>發出的時間，也就是事情大致發生的時間點，
+    而不是最新一則跟進報導的時間。
+  </p>
+
+  <p>
+    有時候後面會多一句「持續報導至 1 小時前」，代表這件事還在發酵，
+    到剛才都還有媒體在跟進。
+  </p>
+
+  <h2>順序是怎麼排的</h2>
+
+  <p>
+    大致依重要性排序，報導家數是主要參考，但不是唯一依據。
+    只有一家報導的重大宣稱會被保守看待，而業配、股價漲跌、
+    內容農場則會被排除。
+  </p>
+
+  <h2>連結會帶你去哪</h2>
+
+  <p>
+    點標題會開啟原始新聞頁面。這裡只放標題、摘要和連結，
+    不轉載內文——完整的報導請到原媒體閱讀。
+  </p>
+
+  <p>
+    如果同一件事有多家報導，連結會指向其中最新的那一則。
+  </p>
+
+  <footer>
+    <a href="./">← 回到首頁</a>
+  </footer>
+
+</div>
+<script src="https://news-agent-assistant.onrender.com/widget.js"
+        data-name="AI小助手"
+        data-accent="#0b6e6e"
+        data-starters="今天有什麼重要新聞？|那排小格子是什麼意思？|時間標籤怎麼看？"></script>
+</body>
+</html>
