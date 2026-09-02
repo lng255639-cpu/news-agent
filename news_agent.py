@@ -651,6 +651,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     color: var(--signal);
     margin: 0 0 0.5rem;
   }}
+  .eyebrow a {{ color: inherit; text-decoration: none; }}
+  .eyebrow a:hover {{ text-decoration: underline; }}
+  .eyebrow a:focus-visible {{ outline: 2px solid var(--signal); outline-offset: 3px; }}
+  footer a {{ color: var(--signal); }}
+
   h1 {{
     font-family: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
     font-size: 1.7rem;
@@ -744,12 +749,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <body>
 <div class="wrap">
 <header>
-  <p class="eyebrow">新聞簡報</p>
+  <p class="eyebrow"><a href="index.html">← 新聞簡報</a></p>
   <h1>{question}</h1>
   <p class="meta">{stamp}　·　過去 {hours} 小時　·　{count} 則</p>
 </header>
 {items}
-<footer>由 news_agent 自動整理　·　佐證格數代表有幾家媒體報導同一事件</footer>
+<footer><a href="index.html">← 回到首頁</a>　·　由 news_agent 自動整理　·　佐證格數代表有幾家媒體報導同一事件</footer>
 </div>
 <script src="https://news-agent-assistant.onrender.com/widget.js"
         data-name="AI小助手"
